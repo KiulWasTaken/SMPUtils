@@ -1,0 +1,4 @@
+name: SMPEvents
+version: '${project.version}'
+main: kiul.smpevents.SMPEvent
+api-version: '1.20'
