@@ -1,4 +1,7 @@
-name: SMPEvents
+name: kiul-SMP-utilities
 version: '${project.version}'
 main: kiul.smpevents.SMPEvent
 api-version: '1.20'
+commands:
+  spawncrate:
+    description: spawns crate
