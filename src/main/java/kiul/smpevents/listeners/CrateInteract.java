@@ -5,6 +5,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -37,7 +38,7 @@ public class CrateInteract implements Listener {
     };
 
     @EventHandler
-    public void OpenCrate (PlayerInteractEntityEvent e) {
+    public void OpenCrate (PlayerInteractAtEntityEvent e) {
         if (e.getRightClicked() instanceof ArmorStand crate) {
             if (!e.getRightClicked().hasMetadata("locked")) {
                 Random random = new Random();

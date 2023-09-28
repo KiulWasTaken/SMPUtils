@@ -19,48 +19,66 @@ import java.util.concurrent.TimeUnit;
 
 public class SpawnCrate {
 
+    public interface MyCallback {
+        void call(Entity entity);
+    }
+
+
+
+    public static Location returnCrateLocation (World world) {
+        Random random = new Random();
+        int x = random.nextInt(0,7900);
+        int z = random.nextInt(0,7900);
+        int y = world.getHighestBlockYAt(x,z);
+        Location crateSpawnLocation = new Location(world,x,y,z);
+        return crateSpawnLocation;}
+
 
 
     public static void createNewCrate (String type, int minutesUntilSpawn, World world) {
         long crateSpawnTime = (System.currentTimeMillis() + minutesUntilSpawn*60*1000);
         long remainingTime = (crateSpawnTime - System.currentTimeMillis());
-        Random random = new Random();
 
-        int x = random.nextInt(0,7900);
-        int z = random.nextInt(0,7900);
-        int y = world.getHighestBlockYAt(x,z);
 
-        Location crateSpawnLocation = new Location(world,x,y,z);
-        while (crateSpawnLocation.getBlock().getType() == Material.WATER) {
-            x = random.nextInt(0,7900);
-            z = random.nextInt(0,7900);
-            y = world.getHighestBlockYAt(x,z);
-            crateSpawnLocation = new Location(world,x,y,z);
-        }
-        Bukkit.broadcastMessage("");
-        Bukkit.broadcastMessage(type + " crate will drop at " + x + " " + y + " " + z + " in " + minutesUntilSpawn + " minutes.");
-        Bukkit.broadcastMessage("");
-        System.currentTimeMillis();
         new BukkitRunnable() {
-            int tick = 1;
+            Location crateSpawnLocation = returnCrateLocation(world);
             @Override
             public void run() {
-                if (System.currentTimeMillis() > crateSpawnTime) {
-                    spawnCrate(type,20,world,x,z);
+                if (crateSpawnLocation.getBlock().getType() == Material.WATER) {
+                    crateSpawnLocation = returnCrateLocation(world);
+                } else {
+                    int x = (int) crateSpawnLocation.getX();
+                    int y = (int) crateSpawnLocation.getY();
+                    int z = (int) crateSpawnLocation.getZ();
+                    Bukkit.broadcastMessage("");
+                    Bukkit.broadcastMessage(type + " crate will drop at " + x + " " + y + " " + z + " in " + minutesUntilSpawn + " minutes.");
+                    Bukkit.broadcastMessage("");
+                    new BukkitRunnable() {
+                        int tick = 1;
+                        @Override
+                        public void run() {
+                            if (System.currentTimeMillis() > crateSpawnTime) {
+                                spawnCrate(type,20,world,x,z);
+                                cancel();
+                            }
+                            tick++;
+                            if (tick >= (((remainingTime/4)/1000)/60)) {
+                                Bukkit.broadcastMessage("");
+                                Bukkit.broadcastMessage(type + " drop will arrive at " + x + " " + y + " " + z + " in " + (((crateSpawnTime - System.currentTimeMillis())/1000)/60) + " minutes.");
+                                Bukkit.broadcastMessage("");
+                                tick = 1;
+                            }
+
+
+
+                        }
+                    }.runTaskTimer(SMPEvent.getPlugin(SMPEvent.class), 0L, 1200L);
                     cancel();
                 }
-                    tick++;
-                if (tick >= (((remainingTime/4)/1000)/60)) {
-                    Bukkit.broadcastMessage("");
-                    Bukkit.broadcastMessage(type + " drop will arrive at " + x + " " + y + " " + z + " in " + (((crateSpawnTime - System.currentTimeMillis())/1000)/60) + " minutes.");
-                    Bukkit.broadcastMessage("");
-                    tick = 1;
-                }
-
-
-
             }
-        }.runTaskTimer(SMPEvent.getPlugin(SMPEvent.class), 0L, 1200L);
+        } .runTaskTimer(SMPEvent.getPlugin(SMPEvent.class), 0L, 1L);
+        System.currentTimeMillis();
+
     }
 
     public static void spawnCrate (String type, int unlockMinutes, World world,int x, int z) {
