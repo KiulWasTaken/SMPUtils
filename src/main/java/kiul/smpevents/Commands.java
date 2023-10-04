@@ -8,6 +8,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 
+import java.util.Random;
+
 public class Commands implements CommandExecutor {
 
     @Override
@@ -16,11 +18,26 @@ public class Commands implements CommandExecutor {
 
         switch (label) {
             case "spawncrate":
-                if (args[0].equalsIgnoreCase("nether") || args[0].equalsIgnoreCase("end")) {
-                    SpawnCrate.createNewCrate(args[0].toUpperCase(), Integer.parseInt(args[1]), p.getWorld());
-                } else {
-                    p.sendMessage(ChatColor.RED + "please use a valid crate type");
+                if (p.isOp()) {
+                        Random random = new Random();
+                        String type;
+                        switch (random.nextInt(0,3)) {
+                            case 0:
+                                type = "END";
+                                break;
+                            case 1:
+                                type = "NETHER";
+                                break;
+                            case 2:
+                                type = "OVERWORLD";
+                                break;
+                            default:
+                                type = "OVERWORLD";
+                                break;
+                        }
+                        SpawnCrate.createNewCrate(type, Integer.parseInt(args[0]), p.getWorld());
                 }
+                break;
 
 
         }
